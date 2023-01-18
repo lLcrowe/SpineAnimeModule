@@ -24,8 +24,9 @@ namespace lLCroweTool.AnimeSystem.Spine
         public string currentMainAnimName;//현재 지정된 대상 => SpineAnimDefineInfo의 이름을 집어넣을것//루프 애님일시
 
         protected virtual void Awake()
-        {   
+        {
             skeletonAnimation = GetComponent<SkeletonAnimation>();
+            skeletonAnimation.Initialize(false);
 
             //로그등록
             LogManager.Register("SpineAnimeModule", "SpineAnimeModule.txt", true, true);
@@ -185,12 +186,6 @@ namespace lLCroweTool.AnimeSystem.Spine
             /// <param name="name">애니메이션 이름</param>
             public virtual void ActionAnim(SpineAnimeModule_FuncBase sAMF, string name)
             {
-                if (loop)
-                {
-                    //루프일시 메인 애님이름 지정
-                    sAMF.currentMainAnimName = name;
-                }
-
                 switch (aniPlayType)
                 {
                     case AniPlayType.Set:
@@ -200,9 +195,23 @@ namespace lLCroweTool.AnimeSystem.Spine
                         AddAnim(sAMF, loop, delay);
                         break;
                     case AniPlayType.Emtpy:
-                        //현재지정된 기능이 없음
+                        //현재는 0번트랙외에 Loop가 아닌 대상일때 마지막에 Empty애님으로 들어감
                         //애님기능처리할 예정이였는데 몰?루
                         break;
+                }
+
+                if (loop)
+                {
+                    //루프일시 메인 애님이름 지정
+                    sAMF.currentMainAnimName = name;
+                }
+                else
+                {
+                    //메인트랙이 아니면 해당애니메이션트랙을 비어버리게 하기
+                    if (trackNumber != 0)
+                    {
+                        sAMF.skeletonAnimation.AnimationState.AddEmptyAnimation(trackNumber, 0.3f, 0.2f);
+                    }
                 }
             }
 
@@ -267,7 +276,7 @@ namespace lLCroweTool.AnimeSystem.Spine
         {
             [SpineAnimation]
             public string spineAnim;//스파인애님이름
-            
+
             [Space]
             //캐싱용도
             public Animation spineAnimRef;//타겟애님
@@ -310,7 +319,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             public string attachmentName;//변경할 어태치
             [Space]
             //캐싱용도
-            public Slot slot; 
+            public Slot slot;
             public Attachment attachment;
 
             public void Init(SpineAnimeModule_FuncBase sAMF)
@@ -319,6 +328,7 @@ namespace lLCroweTool.AnimeSystem.Spine
                 {
                     return;
                 }
+
                 slot = sAMF.skeletonAnimation.skeleton.FindSlot(slotName);
                 attachment = sAMF.skeletonAnimation.skeleton.GetAttachment(slotName, attachmentName);
             }
@@ -349,7 +359,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             public UnityEvent unityEvent = new UnityEvent();//작동될 이벤트
 
             public void Init(SpineAnimeModule_FuncBase sAMF)
-            {   
+            {
                 eventData = sAMF.skeletonAnimation.Skeleton.Data.FindEvent(eventName);
 
                 lLcroweUtil.GetAddUnitEvent(unityEvent);
@@ -396,7 +406,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             public SpineSkinBible spineSkinBible = new SpineSkinBible();
 
             public void Init(SpineAnimeModule_FuncBase sAMF)
-            {   
+            {
                 SkeletonData data = sAMF.skeletonAnimation.SkeletonDataAsset.GetAnimationStateData().SkeletonData;
 
                 foreach (Skin skin in data.Skins)
@@ -431,7 +441,7 @@ namespace lLCroweTool.AnimeSystem.Spine
         //=========================================
         //기능관련(스태딕)
         //=========================================
-      
+
         /// <summary>
         /// 타겟본을 마우스위치에 맞게 움직이게하는 함수
         /// </summary>
@@ -444,7 +454,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
             Vector3 skeletonSpacePoint = sAMF.skeletonAnimation.transform.InverseTransformPoint(worldMousePosition);
             SkeletonAnimation skeletonAnimation = sAMF.skeletonAnimation;
-        skeletonSpacePoint.x *= skeletonAnimation.Skeleton.ScaleX;
+            skeletonSpacePoint.x *= skeletonAnimation.Skeleton.ScaleX;
             skeletonSpacePoint.y *= skeletonAnimation.Skeleton.ScaleY;
             bone.SetLocalPosition(skeletonSpacePoint);//IKBone
         }
@@ -471,8 +481,8 @@ namespace lLCroweTool.AnimeSystem.Spine
             sAMF.skeletonAnimation.state.ClearTracks();//따로 호출해주는게 좋아보임
 
             //클리어할시 바이블도 정리(제작대기)
-            
-            
+
+
         }
 
         //=========================================
