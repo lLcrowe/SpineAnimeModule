@@ -362,7 +362,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             {
                 eventData = sAMF.skeletonAnimation.Skeleton.Data.FindEvent(eventName);
 
-                lLcroweUtil.GetAddUnitEvent(unityEvent);
+                lLcroweUtil.GetAddUnitEvent(ref unityEvent);
                 sAMF.skeletonAnimation.AnimationState.Event += UpdateStateEvent;
             }
 
