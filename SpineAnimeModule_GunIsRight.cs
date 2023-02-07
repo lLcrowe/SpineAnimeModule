@@ -4,12 +4,12 @@ namespace lLCroweTool.AnimeSystem.Spine
 {
     public class SpineAnimeModule_GunIsRight : SpineAnimeModule_FuncBase
     {
-        public SpineAttachmentInfo spineAttachmentInfo = new SpineAttachmentInfo();
+        //어트리뷰트를 만들어서 팝업으로 처리예정
+        public string attackmentNameID;
 
         public override void InitSpineData()
         {
-            spineAttachmentInfo.Init(this);
-            spineAttachmentInfo.SetThisAttachment();
+            spineAttachmentInfoBook.ActionAttackment(attackmentNameID);
         }
 
         public void ActionWalkAnim(Vector2 direction)

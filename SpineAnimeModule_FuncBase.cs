@@ -19,6 +19,7 @@ namespace lLCroweTool.AnimeSystem.Spine
         public bool isRightCurrent = false;
 
         public SpineAnimDefineInfoBook spineAnimDefineInfoBook = new SpineAnimDefineInfoBook();
+        public SpineAttachmentInfoBook spineAttachmentInfoBook = new SpineAttachmentInfoBook();
 
         //리셋을 체크해봐야될듯
         public string currentMainAnimName;//현재 지정된 대상 => SpineAnimDefineInfo의 이름을 집어넣을것//루프 애님일시
@@ -29,10 +30,11 @@ namespace lLCroweTool.AnimeSystem.Spine
             skeletonAnimation.Initialize(false);
 
             //로그등록
-            LogManager.Register("SpineAnimeModule", "SpineAnimeModule.txt", true, true);
-            LogManager.Log("SpineAnimeModule", gameObject.name);
+            LogManager.Register("SpineAnimeModuleLog", "SpineAnimeModuleLog.txt", false, true);
+            LogManager.Log("SpineAnimeModuleLog", gameObject.name + "AnimModulePart_Awaking");
 
             spineAnimDefineInfoBook.Init(this);
+            spineAttachmentInfoBook.Init(this);
             InitSpineData();//데이터초기화
         }
 
@@ -65,18 +67,17 @@ namespace lLCroweTool.AnimeSystem.Spine
         }
 
         /// <summary>
-        /// SpineAnimDefineInfo를 여러개 가진 클래스
+        /// SpineAnimDefineInfo를 여러개 가진 정보클래스
         /// </summary>
         [System.Serializable]
         public class SpineAnimDefineInfoBook : ISpineDataInfo
         {
-            //SpineAnimDefineInfo을 한번더 래핑한 형태
+            //SpineAnimDefineInfo을 한번더 래핑한 형태//집어넣고 비어버리기
             public SpineAnimDefineInfo[] spineAnimDefineInfoArray = new SpineAnimDefineInfo[0];
 
-            [System.Serializable]
-            public class SpineAnimDefineInfoBible : CustomDictionary<string, SpineAnimDefineInfo> { }//Enum처리할시 같이처리
+            private class SpineAnimDefineInfoBible : CustomDictionary<string, SpineAnimDefineInfo> { }//Enum처리할시 같이처리
             [HideInInspector]
-            public SpineAnimDefineInfoBible spineAnimDefineInfoBible = new SpineAnimDefineInfoBible();
+            private SpineAnimDefineInfoBible spineAnimDefineInfoBible = new SpineAnimDefineInfoBible();
 
             public void Init(SpineAnimeModule_FuncBase sAMF)
             {
@@ -239,15 +240,15 @@ namespace lLCroweTool.AnimeSystem.Spine
         [System.Serializable]
         public class SpineAnimRefData : SpineAnimData_Base
         {
-            public AnimationReferenceAsset spineAnimRef;//타겟애님
+            public AnimationReferenceAsset spineAnimRefData;//타겟애님
 
             public override void Init(SpineAnimeModule_FuncBase sAMF)
             {
-                if (ReferenceEquals(spineAnimRef, null))
+                if (ReferenceEquals(spineAnimRefData, null))
                 {
                     //없으면
                     //로그찍기
-                    LogManager.Log("SpineAnimeModule", "'" + sAMF.name + "'에 AnimRef가 존재하지 않습니다." + spineAnimRef.name);
+                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimRef가 존재하지 않습니다." + spineAnimRefData.name);                    
                 }
             }
 
@@ -255,7 +256,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             {
                 //현재애니메이션을 중지시키고 새롭게 세팅한 애니메이션을 재성//믹스(블랜드)데이터가 없으면 혼합이 안됨//믹스 == 블랜드
                 //트랙, 애니메이션 데이터, 루프여부
-                sAMF.skeletonAnimation.AnimationState.SetAnimation(trackNumber, spineAnimRef, loop);
+                sAMF.skeletonAnimation.AnimationState.SetAnimation(trackNumber, spineAnimRefData, loop);
             }
 
             public override void AddAnim(SpineAnimeModule_FuncBase sAMF, bool loop, float delay = 0.5f)
@@ -264,7 +265,7 @@ namespace lLCroweTool.AnimeSystem.Spine
                 //delay가 0 이하이면 믹스데이터에 있는 믹스지속시간//초과이면 그대로 지연시간
                 //루프일시 한바퀴돌고 작동
                 //트랙, 애니메이션 데이터, 루프여부, delay
-                sAMF.skeletonAnimation.AnimationState.AddAnimation(trackNumber, spineAnimRef, loop, delay);
+                sAMF.skeletonAnimation.AnimationState.AddAnimation(trackNumber, spineAnimRefData, loop, delay);
             }
         }
 
@@ -279,22 +280,23 @@ namespace lLCroweTool.AnimeSystem.Spine
 
             [Space]
             //캐싱용도
-            public Animation spineAnimRef;//타겟애님
+            public Animation spineAnimData;//타겟애님
 
             public override void Init(SpineAnimeModule_FuncBase sAMF)
             {
-                if (ReferenceEquals(spineAnimRef, null))
+                spineAnimData = sAMF.skeletonAnimation.AnimationState.Data.SkeletonData.FindAnimation(spineAnim);
+                if (ReferenceEquals(spineAnimData, null))
                 {
+                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimData의 " + spineAnim + "이름이 할당되지 않습니다.");
                     return;
                 }
-                spineAnimRef = sAMF.skeletonAnimation.AnimationState.Data.SkeletonData.FindAnimation(spineAnim);
             }
 
             public override void SetAnim(SpineAnimeModule_FuncBase sAMF, bool loop)
             {
                 //현재애니메이션을 중지시키고 새롭게 세팅한 애니메이션을 재성//믹스(블랜드)데이터가 없으면 혼합이 안됨//믹스 == 블랜드
                 //트랙, 애니메이션 데이터, 루프여부
-                sAMF.skeletonAnimation.AnimationState.SetAnimation(trackNumber, spineAnimRef, loop);
+                sAMF.skeletonAnimation.AnimationState.SetAnimation(trackNumber, spineAnimData, loop);
             }
 
             public override void AddAnim(SpineAnimeModule_FuncBase sAMF, bool loop, float delay = 0.5f)
@@ -303,7 +305,42 @@ namespace lLCroweTool.AnimeSystem.Spine
                 //delay가 0 이하이면 믹스데이터에 있는 믹스지속시간//초과이면 그대로 지연시간
                 //루프일시 한바퀴돌고 작동
                 //트랙, 애니메이션 데이터, 루프여부, delay
-                sAMF.skeletonAnimation.AnimationState.AddAnimation(trackNumber, spineAnimRef, loop, delay);
+                sAMF.skeletonAnimation.AnimationState.AddAnimation(trackNumber, spineAnimData, loop, delay);
+            }
+        }
+
+        /// <summary>
+        /// SpineAttachmentInfo를 여러개 가진 정보클래스
+        /// </summary>
+        public class SpineAttachmentInfoBook : ISpineDataInfo
+        {
+            //스파인어태치먼트에 직접적으로
+            public SpineAttachmentInfo[] spineAttachmentInfoArray = new SpineAttachmentInfo[0];
+            private class SpineAttachmentInfoBible : CustomDictionary<string, SpineAttachmentInfo> { }//Enum처리할시 같이처리
+            private SpineAttachmentInfoBible spineAttachmentInfoBible = new SpineAttachmentInfoBible();
+            public void Init(SpineAnimeModule_FuncBase sAMF)
+            {
+                for (int i = 0; i < spineAttachmentInfoArray.Length; i++)
+                {
+                    SpineAttachmentInfo temp = spineAttachmentInfoArray[i];
+                    temp.Init(sAMF);
+                    spineAttachmentInfoBible.Add(temp.attachmentNameID, temp);
+                }
+            }
+
+            /// <summary>
+            /// 어태치먼트 변경
+            /// </summary>
+            /// <param name="attackmentNameID">어태치먼트ID</param>
+            public void ActionAttackment(string attackmentNameID)
+            {
+                if (!spineAttachmentInfoBible.ContainsKey(attackmentNameID))
+                {
+                    return;
+                }
+
+                //어태치변경작동
+                spineAttachmentInfoBible[attackmentNameID].SetThisAttachment();
             }
         }
 
@@ -313,24 +350,26 @@ namespace lLCroweTool.AnimeSystem.Spine
         [System.Serializable]
         public class SpineAttachmentInfo : ISpineDataInfo
         {
+            //세팅해줘야됨
+            [SpineAttachment]
+            public string attachmentNameID;//변경할 어태치//아이디대상
             [SpineSlot]
             public string slotName;//변경할 슬롯
-            [SpineAttachment]
-            public string attachmentName;//변경할 어태치
+            
             [Space]
             //캐싱용도
-            public Slot slot;
             public Attachment attachment;
-
+            public Slot slot;
             public void Init(SpineAnimeModule_FuncBase sAMF)
             {
-                if (string.IsNullOrEmpty(slotName) || string.IsNullOrEmpty(attachmentName))
+                if (string.IsNullOrEmpty(slotName) || string.IsNullOrEmpty(attachmentNameID))
                 {
+                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'의 " + slotName + " , " + attachmentNameID + "이 제대로 설정되지않아 비어있습니다.");
                     return;
                 }
 
                 slot = sAMF.skeletonAnimation.skeleton.FindSlot(slotName);
-                attachment = sAMF.skeletonAnimation.skeleton.GetAttachment(slotName, attachmentName);
+                attachment = sAMF.skeletonAnimation.skeleton.GetAttachment(slotName, attachmentNameID);
             }
 
             /// <summary>
@@ -400,6 +439,8 @@ namespace lLCroweTool.AnimeSystem.Spine
         {
             //이 구역은 다른구역과 다르게 스킨이라는걸 각각들고 있는것보다
             //특정데이터에 맞는 스킨들을 한구역에서 가지고 잇는게 더좋아보여서 Static이 괜찮아보인다 생각됨.
+            //20230207
+            //나중에 전체적으로 데이터는 스크립터블쪽으로 이동시킬예정
 
             [System.Serializable]
             public class SpineSkinBible : CustomDictionary<string, Skin> { }
