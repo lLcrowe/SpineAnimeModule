@@ -595,7 +595,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             SkeletonPartsRenderer skeletonPartsRenderer = skeletonRenderSeparator.partsRenderers[0];
         }
 
-        [ButtonMethod]
+        
         public void CheckChange()
         {
             Slot slot = anim.skeleton.FindSlot("WeaponSlot");
@@ -648,7 +648,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             Attachment attachment4 = slot.Attachment;
         }
 
-        [ButtonMethod]
+        
         public void CheckFunc()
         {
             //구조및 기능 체크중
