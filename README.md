@@ -5,6 +5,10 @@ Spine2D API Adaptor
 skeletonAnimation이 존재하는 게임오브젝트와 같이넣는 컴포넌트모듈  
 Spine API를 한번 써놓기 편하게 래핑해놓은 어댑터  
 
+-=에디터기능
+선택시 재성없이 애니메이션을 볼수 있게 지원
+
+
 
 사용법 사진추가 예정  
 
