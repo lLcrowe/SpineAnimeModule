@@ -6,7 +6,7 @@ using EventData = Spine.EventData;
 using Event = Spine.Event;
 using Animation = Spine.Animation;
 using lLCroweTool.Dictionary;
-using lLCroweTool.LogSystem;
+//using lLCroweTool.LogSystem;
 
 namespace lLCroweTool.AnimeSystem.Spine
 {
@@ -30,8 +30,8 @@ namespace lLCroweTool.AnimeSystem.Spine
             skeletonAnimation.Initialize(false);
 
             //로그등록
-            LogManager.Register("SpineAnimeModuleLog", "SpineAnimeModuleLog.txt", false, true);
-            LogManager.Log("SpineAnimeModuleLog", gameObject.name + "AnimModulePart_Awaking");
+            //LogManager.Register("SpineAnimeModuleLog", "SpineAnimeModuleLog.txt", false, true);
+            //LogManager.Log("SpineAnimeModuleLog", gameObject.name + "AnimModulePart_Awaking");
 
             spineAnimDefineInfoBook.Init(this);
             spineAttachmentInfoBook.Init(this);
@@ -248,7 +248,7 @@ namespace lLCroweTool.AnimeSystem.Spine
                 {
                     //없으면
                     //로그찍기
-                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimRef가 존재하지 않습니다." + spineAnimRefData.name);                    
+                    //LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimRef가 존재하지 않습니다." + spineAnimRefData.name);                    
                 }
             }
 
@@ -287,7 +287,7 @@ namespace lLCroweTool.AnimeSystem.Spine
                 spineAnimData = sAMF.skeletonAnimation.AnimationState.Data.SkeletonData.FindAnimation(spineAnim);
                 if (ReferenceEquals(spineAnimData, null))
                 {
-                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimData의 " + spineAnim + "이름이 할당되지 않습니다.");
+                    //LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'에 AnimData의 " + spineAnim + "이름이 할당되지 않습니다.");
                     return;
                 }
             }
@@ -364,7 +364,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             {
                 if (string.IsNullOrEmpty(slotName) || string.IsNullOrEmpty(attachmentNameID))
                 {
-                    LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'의 " + slotName + " , " + attachmentNameID + "이 제대로 설정되지않아 비어있습니다.");
+                    //LogManager.Log("SpineAnimeModuleLog", "'" + sAMF.name + "'의 " + slotName + " , " + attachmentNameID + "이 제대로 설정되지않아 비어있습니다.");
                     return;
                 }
 
@@ -400,8 +400,6 @@ namespace lLCroweTool.AnimeSystem.Spine
             public void Init(SpineAnimeModule_FuncBase sAMF)
             {
                 eventData = sAMF.skeletonAnimation.Skeleton.Data.FindEvent(eventName);
-
-                lLcroweUtil.GetAddUnitEvent(ref unityEvent);
                 sAMF.skeletonAnimation.AnimationState.Event += UpdateStateEvent;
             }
 

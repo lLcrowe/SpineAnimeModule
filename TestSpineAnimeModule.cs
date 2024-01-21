@@ -623,7 +623,7 @@ namespace lLCroweTool.AnimeSystem.Spine
             //ikConstraint.Mix = 1;
             PathConstraint pathConstraint = anim.skeleton.FindPathConstraint("");
             TransformConstraint transformConstraint = anim.skeleton.FindTransformConstraint("");
-            SpringConstraint springConstraint = anim.skeleton.FindSpringConstraint("");//아직없음
+            //SpringConstraint springConstraint = anim.skeleton.FindSpringConstraint("");//아직없음
 
 
             //확인해보니//스킨별로 따로 들어감 체크하기

@@ -26,7 +26,5 @@ namespace lLCroweTool.AnimeSystem.Spine
         {
             spineAnimDefineInfoBook.ActionAnim(this, "Attack");
         }
-
-    
     }
 }
